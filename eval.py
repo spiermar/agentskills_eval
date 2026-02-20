@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import json, os, re, sys, subprocess
 from dataclasses import dataclass
 from typing import Any, Dict, List
@@ -8,7 +9,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CASES_PATH = os.path.join(os.path.dirname(__file__), "evals", "cases.jsonl")
-SKILL_ROOT = os.path.dirname(__file__)
+DEFAULT_SKILL_ROOT = os.path.dirname(__file__)
+DEFAULT_SKILLS_DIR = "skills/"
 
 
 @dataclass
@@ -28,7 +30,7 @@ def load_cases(path: str) -> List[Dict[str, Any]]:
     return cases
 
 
-def run_agent(prompt: str) -> RunResult:
+def run_agent(prompt: str, skill_root: str, skills_dir: str) -> RunResult:
     """
     Runs evals/runner.py which should:
       - create an isolated workspace
@@ -39,7 +41,9 @@ def run_agent(prompt: str) -> RunResult:
         sys.executable,
         os.path.join(os.path.dirname(__file__), "runner.py"),
         "--skill-root",
-        SKILL_ROOT,
+        skill_root,
+        "--skills-dir",
+        skills_dir,
         "--prompt",
         prompt,
     ]
@@ -91,12 +95,12 @@ def skill_was_used(tool_calls: List[Dict[str, Any]]) -> bool:
     return False
 
 
-def eval_case(case: Dict[str, Any]) -> Dict[str, Any]:
+def eval_case(case: Dict[str, Any], skill_root: str, skills_dir: str) -> Dict[str, Any]:
     rid = case["id"]
     prompt = case["prompt"]
     expect = case.get("expect", {})
 
-    run = run_agent(prompt)
+    run = run_agent(prompt, skill_root, skills_dir)
 
     checks = []
     ok = True
@@ -145,8 +149,21 @@ def eval_case(case: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--skill-root",
+        default=DEFAULT_SKILL_ROOT,
+        help="Repo root to copy into an isolated workspace.",
+    )
+    ap.add_argument(
+        "--skills-dir",
+        default=DEFAULT_SKILLS_DIR,
+        help="Directory (relative to repo root) containing skills. Default: skills/",
+    )
+    args = ap.parse_args()
+
     cases = load_cases(CASES_PATH)
-    results = [eval_case(c) for c in cases]
+    results = [eval_case(c, args.skill_root, args.skills_dir) for c in cases]
 
     passed = sum(1 for r in results if r["passed"])
     total = len(results)
