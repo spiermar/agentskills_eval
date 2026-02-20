@@ -52,6 +52,18 @@ uv run python runner.py --skill-root . --prompt "..." --model claude-sonnet-4-20
 uv run python interactive.py --skill-root . --skills-dir skills/
 ```
 
+## Context files
+
+Load custom context files (e.g., AGENTS.md, SOUL.md) that get injected as system messages:
+
+```bash
+uv run python runner.py --skill-root . --prompt "..." --context-files AGENTS.md,SOUL.md
+uv run python interactive.py --skill-root . --context-files AGENTS.md
+```
+
 Notes:
+- Context files are comma-separated and loaded in order provided.
+- Context is injected before skills as system messages.
+- Context is delimited by `CONTEXT START/END` markers.
 - Skills are discovered by finding `SKILL.md` or `skill.md` under the skills dir.
 - Skills are injected into a system message delimited by `SKILL START/END` markers.

@@ -8,6 +8,8 @@ from typing import Any, Dict, List, Tuple
 
 from openai import OpenAI
 
+from context import build_context
+
 
 def item_to_dict(item: Any) -> Dict[str, Any]:
     if isinstance(item, dict):
@@ -148,6 +150,11 @@ def main() -> None:
         help="Max total characters of skills text injected.",
     )
     ap.add_argument(
+        "--context-files",
+        default="",
+        help="Comma-separated list of context files to load (e.g., AGENTS.md,SOUL.md).",
+    )
+    ap.add_argument(
         "--max-steps", type=int, default=20, help="Max tool-loop iterations."
     )
     ap.add_argument(
@@ -170,6 +177,13 @@ def main() -> None:
     skills_context, skills_meta = build_skills_context(
         workspace_dir=workspace_dir,
         skills_dir=args.skills_dir,
+        max_chars_total=args.max_skill_chars,
+    )
+
+    context_files = [f.strip() for f in args.context_files.split(",") if f.strip()]
+    context_str, context_meta = build_context(
+        workspace_dir=workspace_dir,
+        files=context_files,
         max_chars_total=args.max_skill_chars,
     )
 
@@ -220,6 +234,8 @@ def main() -> None:
     tool_calls: List[Dict[str, Any]] = []
 
     initial_input: List[Dict[str, Any]] = []
+    if context_str.strip():
+        initial_input.append({"role": "system", "content": context_str})
     if skills_context.strip():
         initial_input.append({"role": "system", "content": skills_context})
     initial_input.append({"role": "user", "content": args.prompt})
@@ -260,6 +276,7 @@ def main() -> None:
                         "final_text": final_text,
                         "tool_calls": tool_calls,
                         "skills_loaded": skills_meta,
+                        "context_loaded": context_meta,
                     }
                 )
             )
@@ -353,6 +370,7 @@ def main() -> None:
                 "final_text": "",
                 "tool_calls": tool_calls,
                 "skills_loaded": skills_meta,
+                "context_loaded": context_meta,
                 "error": "tool loop exceeded max steps",
             }
         )

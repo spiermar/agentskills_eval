@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Tuple
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from context import build_context
+
 load_dotenv()
 
 
@@ -193,6 +195,11 @@ def main() -> None:
         help="Max total characters of skills text injected.",
     )
     ap.add_argument(
+        "--context-files",
+        default="",
+        help="Comma-separated list of context files to load (e.g., AGENTS.md,SOUL.md).",
+    )
+    ap.add_argument(
         "--max-steps", type=int, default=20, help="Max tool-loop iterations per turn."
     )
     ap.add_argument(
@@ -218,16 +225,27 @@ def main() -> None:
         max_chars_total=args.max_skill_chars,
     )
 
+    context_files = [f.strip() for f in args.context_files.split(",") if f.strip()]
+    context_str, context_meta = build_context(
+        workspace_dir=workspace_dir,
+        files=context_files,
+        max_chars_total=args.max_skill_chars,
+    )
+
     client_kwargs = {"api_key": os.environ.get("OPENAI_API_KEY")}
     if args.api_base:
         client_kwargs["base_url"] = args.api_base
     client = OpenAI(**client_kwargs)
 
     conversation: List[Dict[str, Any]] = []
+    if context_str.strip():
+        conversation.append({"role": "system", "content": context_str})
     if skills_context.strip():
         conversation.append({"role": "system", "content": skills_context})
 
     print(f"Interactive session started. Workspace: {workspace_dir}")
+    if context_meta:
+        print(f"Loaded context file(s): {', '.join(p['path'] for p in context_meta)}")
     print(
         f"Loaded {len(skills_meta)} skill(s): {', '.join(s.get('name', 'unnamed') or s['path'] for s in skills_meta)}"
     )
@@ -253,6 +271,8 @@ def main() -> None:
 
         if user_input.lower() == "clear":
             conversation = []
+            if context_str.strip():
+                conversation.append({"role": "system", "content": context_str})
             if skills_context.strip():
                 conversation.append({"role": "system", "content": skills_context})
             print("Conversation cleared.")
