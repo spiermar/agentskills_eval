@@ -3,6 +3,10 @@ import json, os, re, sys, subprocess
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 CASES_PATH = os.path.join(os.path.dirname(__file__), "evals", "cases.jsonl")
 SKILL_ROOT = os.path.dirname(__file__)
 

@@ -6,7 +6,10 @@ import subprocess
 import tempfile
 from typing import Any, Dict, List, Tuple
 
+from dotenv import load_dotenv
 from openai import OpenAI
+
+load_dotenv()
 
 
 def item_to_dict(item: Any) -> Dict[str, Any]:
