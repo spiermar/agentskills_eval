@@ -30,7 +30,7 @@ def load_cases(path: str) -> List[Dict[str, Any]]:
     return cases
 
 
-def run_agent(prompt: str, skill_root: str, skills_dir: str) -> RunResult:
+def run_agent(prompt: str, workdir: str, skills_dir: str) -> RunResult:
     """
     Runs evals/runner.py which should:
       - create an isolated workspace
@@ -40,8 +40,8 @@ def run_agent(prompt: str, skill_root: str, skills_dir: str) -> RunResult:
     cmd = [
         sys.executable,
         os.path.join(os.path.dirname(__file__), "runner.py"),
-        "--skill-root",
-        skill_root,
+        "--workdir",
+        workdir,
         "--skills-dir",
         skills_dir,
         "--prompt",
@@ -95,12 +95,12 @@ def skill_was_used(tool_calls: List[Dict[str, Any]]) -> bool:
     return False
 
 
-def eval_case(case: Dict[str, Any], skill_root: str, skills_dir: str) -> Dict[str, Any]:
+def eval_case(case: Dict[str, Any], workdir: str, skills_dir: str) -> Dict[str, Any]:
     rid = case["id"]
     prompt = case["prompt"]
     expect = case.get("expect", {})
 
-    run = run_agent(prompt, skill_root, skills_dir)
+    run = run_agent(prompt, workdir, skills_dir)
 
     checks = []
     ok = True
@@ -163,7 +163,7 @@ def main():
     args = ap.parse_args()
 
     cases = load_cases(CASES_PATH)
-    results = [eval_case(c, args.skill_root, args.skills_dir) for c in cases]
+    results = [eval_case(c, args.workdir, args.skills_dir) for c in cases]
 
     passed = sum(1 for r in results if r["passed"])
     total = len(results)

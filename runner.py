@@ -133,7 +133,7 @@ def build_skills_context(
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument(
-        "--skill-root",
+        "--workdir",
         required=True,
         help="Repo root to copy into an isolated workspace.",
     )

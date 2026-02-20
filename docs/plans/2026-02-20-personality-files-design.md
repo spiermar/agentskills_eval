@@ -333,7 +333,7 @@ You are a helpful assistant who speaks in a friendly tone.
 
 Run:
 ```bash
-python runner.py --skill-root . --prompt "Hello" --personality-files test_personality.md
+python runner.py --workdir . --prompt "Hello" --personality-files test_personality.md
 ```
 
 Expected: JSON output with `personality_loaded` containing the test file

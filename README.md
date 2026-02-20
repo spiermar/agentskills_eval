@@ -32,24 +32,24 @@ python eval.py
 
 # Using console scripts (after uv sync)
 agent-eval
-agent-runner --skill-root . --prompt "..."
-agent-interactive --skill-root .
+agent-runner --workdir . --prompt "..."
+agent-interactive --workdir .
 ```
 
 ## Runner arguments
 
 ```bash
-uv run python runner.py --skill-root . --prompt "..."
-uv run python runner.py --skill-root . --skills-dir skills/ --prompt "..."
+uv run python runner.py --workdir . --prompt "..."
+uv run python runner.py --workdir . --skills-dir skills/ --prompt "..."
 
 # Use custom model and API endpoint
-uv run python runner.py --skill-root . --prompt "..." --model claude-sonnet-4-20250514 --api-base https://api.anthropic.com
+uv run python runner.py --workdir . --prompt "..." --model claude-sonnet-4-20250514 --api-base https://api.anthropic.com
 ```
 
 ## Interactive session
 
 ```bash
-uv run python interactive.py --skill-root . --skills-dir skills/
+uv run python interactive.py --workdir . --skills-dir skills/
 ```
 
 ## Context files
@@ -57,8 +57,8 @@ uv run python interactive.py --skill-root . --skills-dir skills/
 Load custom context files (e.g., AGENTS.md, SOUL.md) that get injected as system messages:
 
 ```bash
-uv run python runner.py --skill-root . --prompt "..." --context-files AGENTS.md,SOUL.md
-uv run python interactive.py --skill-root . --context-files AGENTS.md
+uv run python runner.py --workdir . --prompt "..." --context-files AGENTS.md,SOUL.md
+uv run python interactive.py --workdir . --context-files AGENTS.md
 ```
 
 Notes:

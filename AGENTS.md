@@ -19,10 +19,10 @@ This is a Python-based evaluation framework for testing agent skills. It uses th
 python eval.py
 
 # Run the runner directly with custom prompts
-python runner.py --skill-root . --prompt "..."
+python runner.py --workdir . --prompt "..."
 
 # Run with custom skills directory
-python runner.py --skill-root . --skills-dir skills/ --prompt "..."
+python runner.py --workdir . --skills-dir skills/ --prompt "..."
 ```
 
 ### Required Environment Variables
@@ -40,10 +40,10 @@ export OPENAI_API_BASE="https://api.openai.com/v1"  # For other providers (e.g.,
 
 ```bash
 # Start an interactive chat session with skills loaded
-python interactive.py --skill-root . --skills-dir skills/
+python interactive.py --workdir . --skills-dir skills/
 
 # Custom max tool iterations per turn
-python interactive.py --skill-root . --max-steps 10
+python interactive.py --workdir . --max-steps 10
 ```
 
 Commands in interactive mode:

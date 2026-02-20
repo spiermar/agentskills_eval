@@ -179,7 +179,7 @@ def main() -> None:
         description="Interactive chat session with agent skills"
     )
     ap.add_argument(
-        "--skill-root",
+        "--workdir",
         required=True,
         help="Repo root to copy into an isolated workspace.",
     )
