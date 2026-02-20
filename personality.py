@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
+import os
 from typing import Dict, List, Tuple
 
-from runner import read_file
+
+def safe_join(workspace: str, relpath: str) -> str:
+    relpath = relpath.lstrip("/").replace("..", "")
+    return os.path.join(workspace, relpath)
+
+
+def read_file(workspace: str, path: str) -> str:
+    abspath = safe_join(workspace, path)
+    with open(abspath, "r", encoding="utf-8") as f:
+        return f.read()
 
 
 def build_personality_context(
