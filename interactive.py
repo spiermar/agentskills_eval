@@ -290,6 +290,10 @@ def main() -> None:
             if not pending_calls:
                 break
 
+            # Append model output items to conversation for context
+            for item in resp.output or []:
+                conversation.append(item_to_dict(item))
+
             tool_outputs = []
             for call in pending_calls:
                 call_type = call.get("type")
@@ -368,10 +372,13 @@ def main() -> None:
                         }
                     )
 
+            # Append tool outputs to conversation and resend full context
+            conversation.extend(tool_outputs)
+
             resp = client.responses.create(
                 model=args.model,
-                previous_response_id=resp.id,
-                input=tool_outputs,
+                input=conversation,
+                tools=get_tools(),
                 store=False,
             )
 

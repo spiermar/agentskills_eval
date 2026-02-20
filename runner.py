@@ -334,10 +334,15 @@ def main() -> None:
                     }
                 )
 
+        # Append model output items and tool outputs to conversation
+        for item in resp.output or []:
+            initial_input.append(item_to_dict(item))
+        initial_input.extend(tool_outputs)
+
         resp = client.responses.create(
             model=args.model,
-            previous_response_id=resp.id,
-            input=tool_outputs,
+            input=initial_input,
+            tools=tools,
             store=False,
         )
 
