@@ -208,3 +208,48 @@ When adding new functionality:
 - See `README.md` for quick start guide
 - Check `runner.py` for tool implementation examples
 - Examine `evals/cases.jsonl` for test case format
+
+## Lessons Learned
+
+### Avoid Circular Imports
+
+Never import from `runner.py` in shared modules. This causes circular import errors:
+
+```python
+# BAD - causes circular import
+from runner import read_file
+```
+
+Instead, duplicate the needed functions in your module:
+
+```python
+# GOOD - self-contained module
+def safe_join(workspace: str, relpath: str) -> str:
+    relpath = relpath.lstrip("/").replace("..", "")
+    return os.path.join(workspace, relpath)
+
+def read_file(workspace: str, path: str) -> str:
+    abspath = safe_join(workspace, path)
+    with open(abspath, "r", encoding="utf-8") as f:
+        return f.read()
+```
+
+### Import Placement
+
+- Always place imports at the top of the file, not inside functions or loops
+- Importing inside loops causes repeated import overhead
+- Importing inside functions can cause circular import issues
+
+### Test Early and Often
+
+- Test each task after implementation before proceeding to the next
+- Run syntax checks: `python3 -m py_compile <file>.py`
+- Verify imports work: `python3 -c "from module import function"`
+- Run a quick end-to-end test to catch integration issues early
+
+### Type Annotations
+
+- Be pragmatic with type annotations - don't over-engineer
+- If a value needs to be a specific type for the API, cast it explicitly
+- Don't change type annotations mid-implementation based on review feedback without good reason
+- The spec's type annotation takes precedence; implement to match the spec
