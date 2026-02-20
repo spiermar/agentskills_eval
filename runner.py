@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Tuple
 
 from openai import OpenAI
 
-from personality import build_personality_context
+from context import build_context
 
 
 def item_to_dict(item: Any) -> Dict[str, Any]:
@@ -150,9 +150,9 @@ def main() -> None:
         help="Max total characters of skills text injected.",
     )
     ap.add_argument(
-        "--personality-files",
+        "--context-files",
         default="",
-        help="Comma-separated list of personality files to load (e.g., AGENTS.md,SOUL.md).",
+        help="Comma-separated list of context files to load (e.g., AGENTS.md,SOUL.md).",
     )
     ap.add_argument(
         "--max-steps", type=int, default=20, help="Max tool-loop iterations."
@@ -180,12 +180,10 @@ def main() -> None:
         max_chars_total=args.max_skill_chars,
     )
 
-    personality_files = [
-        f.strip() for f in args.personality_files.split(",") if f.strip()
-    ]
-    personality_context, personality_meta = build_personality_context(
+    context_files = [f.strip() for f in args.context_files.split(",") if f.strip()]
+    context_str, context_meta = build_context(
         workspace_dir=workspace_dir,
-        files=personality_files,
+        files=context_files,
         max_chars_total=args.max_skill_chars,
     )
 
@@ -236,8 +234,8 @@ def main() -> None:
     tool_calls: List[Dict[str, Any]] = []
 
     initial_input: List[Dict[str, Any]] = []
-    if personality_context.strip():
-        initial_input.append({"role": "system", "content": personality_context})
+    if context_str.strip():
+        initial_input.append({"role": "system", "content": context_str})
     if skills_context.strip():
         initial_input.append({"role": "system", "content": skills_context})
     initial_input.append({"role": "user", "content": args.prompt})
@@ -278,7 +276,7 @@ def main() -> None:
                         "final_text": final_text,
                         "tool_calls": tool_calls,
                         "skills_loaded": skills_meta,
-                        "personality_loaded": personality_meta,
+                        "context_loaded": context_meta,
                     }
                 )
             )
@@ -372,7 +370,7 @@ def main() -> None:
                 "final_text": "",
                 "tool_calls": tool_calls,
                 "skills_loaded": skills_meta,
-                "personality_loaded": personality_meta,
+                "context_loaded": context_meta,
                 "error": "tool loop exceeded max steps",
             }
         )

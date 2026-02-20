@@ -14,10 +14,10 @@ def read_file(workspace: str, path: str) -> str:
         return f.read()
 
 
-def build_personality_context(
+def build_context(
     workspace_dir: str, files: List[str], max_chars_total: int = 200_000
 ) -> Tuple[str, List[Dict[str, str]]]:
-    """Build personality context from specified files.
+    """Build context from specified files.
 
     Args:
         workspace_dir: Absolute path to workspace.
@@ -37,8 +37,8 @@ def build_personality_context(
         except Exception:
             continue
 
-        header = f"\n\n===== PERSONALITY START: {rel_path} =====\n"
-        footer = f"\n===== PERSONALITY END: {rel_path} =====\n"
+        header = f"\n\n===== CONTEXT START: {rel_path} =====\n"
+        footer = f"\n===== CONTEXT END: {rel_path} =====\n"
 
         addition = header + text + footer
         if used + len(addition) > max_chars_total:
@@ -52,9 +52,9 @@ def build_personality_context(
         return "", meta
 
     context = (
-        "You have the following personality/persona definitions. "
+        "You have the following context definitions. "
         "Follow these instructions to shape your responses.\n"
-        "Personality definitions are provided below delimited by PERSONALITY START/END markers."
+        "Context definitions are provided below delimited by CONTEXT START/END markers."
         + "".join(chunks)
     )
     return context, meta
