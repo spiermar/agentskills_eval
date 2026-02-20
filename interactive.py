@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Tuple
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from personality import build_personality_context
+
 load_dotenv()
 
 
@@ -193,6 +195,11 @@ def main() -> None:
         help="Max total characters of skills text injected.",
     )
     ap.add_argument(
+        "--personality-files",
+        default="",
+        help="Comma-separated list of personality files to load (e.g., AGENTS.md,SOUL.md).",
+    )
+    ap.add_argument(
         "--max-steps", type=int, default=20, help="Max tool-loop iterations per turn."
     )
     ap.add_argument(
@@ -218,16 +225,31 @@ def main() -> None:
         max_chars_total=args.max_skill_chars,
     )
 
+    personality_files = [
+        f.strip() for f in args.personality_files.split(",") if f.strip()
+    ]
+    personality_context, personality_meta = build_personality_context(
+        workspace_dir=workspace_dir,
+        files=personality_files,
+        max_chars_total=args.max_skill_chars,
+    )
+
     client_kwargs = {"api_key": os.environ.get("OPENAI_API_KEY")}
     if args.api_base:
         client_kwargs["base_url"] = args.api_base
     client = OpenAI(**client_kwargs)
 
     conversation: List[Dict[str, Any]] = []
+    if personality_context.strip():
+        conversation.append({"role": "system", "content": personality_context})
     if skills_context.strip():
         conversation.append({"role": "system", "content": skills_context})
 
     print(f"Interactive session started. Workspace: {workspace_dir}")
+    if personality_meta:
+        print(
+            f"Loaded personality file(s): {', '.join(p['path'] for p in personality_meta)}"
+        )
     print(
         f"Loaded {len(skills_meta)} skill(s): {', '.join(s.get('name', 'unnamed') or s['path'] for s in skills_meta)}"
     )
@@ -253,6 +275,8 @@ def main() -> None:
 
         if user_input.lower() == "clear":
             conversation = []
+            if personality_context.strip():
+                conversation.append({"role": "system", "content": personality_context})
             if skills_context.strip():
                 conversation.append({"role": "system", "content": skills_context})
             print("Conversation cleared.")
