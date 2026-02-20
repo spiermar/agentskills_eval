@@ -1,0 +1,13 @@
+[project]
+name = "agentskills-eval"
+version = "0.1.0"
+description = "Evaluation framework for testing agent skills"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.0.0",
+]
+
+[project.scripts]
+agent-eval = "eval:main"
+agent-runner = "runner:main"
+agent-interactive = "interactive:main"
