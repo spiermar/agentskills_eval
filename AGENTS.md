@@ -253,3 +253,27 @@ def read_file(workspace: str, path: str) -> str:
 - If a value needs to be a specific type for the API, cast it explicitly
 - Don't change type annotations mid-implementation based on review feedback without good reason
 - The spec's type annotation takes precedence; implement to match the spec
+
+### Virtual Environment Issues
+
+When testing in a worktree, Python imports may fail because dependencies aren't available:
+
+```bash
+# Error you'll see:
+ModuleNotFoundError: No module named 'openai'
+```
+
+Fix by using the parent project's venv:
+
+```bash
+# Source the venv from the parent project directory
+source /path/to/parent/.venv/bin/activate
+cd /path/to/worktree
+python runner.py ...
+```
+
+Or use PYTHONPATH:
+
+```bash
+PYTHONPATH=/path/to/worktree python -c "from module import ..."
+```
