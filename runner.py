@@ -52,7 +52,7 @@ def main() -> None:
     workspace_dir = tempfile.mkdtemp(prefix="skill-eval-openai-")
     import shutil
 
-    shutil.copytree(os.path.abspath(args.skill_root), workspace_dir, dirs_exist_ok=True)
+    shutil.copytree(os.path.abspath(args.workdir), workspace_dir, dirs_exist_ok=True)
 
     skills_context, skills_meta = build_skills_context(
         workspace_dir=workspace_dir,
