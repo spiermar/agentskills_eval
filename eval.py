@@ -151,7 +151,7 @@ def eval_case(case: Dict[str, Any], workdir: str, skills_dir: str) -> Dict[str, 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument(
-        "--skill-root",
+        "--workdir",
         default=DEFAULT_WORKDIR,
         help="Repo root to copy into an isolated workspace.",
     )
