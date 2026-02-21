@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CASES_PATH = os.path.join(os.path.dirname(__file__), "evals", "cases.jsonl")
-DEFAULT_SKILL_ROOT = os.path.dirname(__file__)
+DEFAULT_WORKDIR = os.path.dirname(__file__)
 DEFAULT_SKILLS_DIR = "skills/"
 
 
@@ -152,7 +152,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--skill-root",
-        default=DEFAULT_SKILL_ROOT,
+        default=DEFAULT_WORKDIR,
         help="Repo root to copy into an isolated workspace.",
     )
     ap.add_argument(
